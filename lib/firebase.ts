@@ -49,10 +49,18 @@ export class LocalApp implements ILocalApp {
     static getInstance(): LocalApp {
         return LocalApp.instance
     }
+
+    static getDbGroup(debug? : number): IDBGroupConfig {
+        return {
+            localApp: LocalApp.instance,
+            getDatabase: LocalApp.getInstance().firestore,
+            debug: debug
+        }
+    }
     static init(sCfg, fix: Fixture[]): void {
         if (LocalApp.instance !== undefined) throw new Error("Service already initialized")
-        this.serviceConfig = sCfg
-        this.instance = this.makeLocalApp(fix)
+        LocalApp.serviceConfig = sCfg
+        LocalApp.instance = LocalApp.makeLocalApp(fix)
     }
 
     static makeLocalApp(fix: Fixture[]): LocalApp {
@@ -62,16 +70,16 @@ export class LocalApp implements ILocalApp {
             */
             let app = admin.initializeApp({
                 credential: admin.credential.applicationDefault(),
-                databaseURL: this.serviceConfig.prodDatabaseUrl
+                databaseURL: LocalApp.serviceConfig.prodDatabaseUrl
             });
             return new LocalApp(app.firestore())
         } else {
             if (process.env.DB_REPO == 'remote') {
-                var serviceAccount = require(this.serviceConfig.localCredentialsPath);
+                var serviceAccount = require(LocalApp.serviceConfig.localCredentialsPath);
     
                 var defaultAppConfig = {
                     credential: admin.credential.cert(serviceAccount),
-                    databaseURL: this.serviceConfig.devDatabaseUrl
+                    databaseURL: LocalApp.serviceConfig.devDatabaseUrl
                 };
                 // Initialize the default app
                 return new LocalApp(admin.initializeApp(defaultAppConfig).firestore())

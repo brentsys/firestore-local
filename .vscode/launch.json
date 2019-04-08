@@ -23,6 +23,27 @@
                 "NODE_ENV": "test"
             },
             "preLaunchTask": "npm: prepare"
-        }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha RemoteDB - Current File",
+            "program": "/Users/henrisack/.nvm/versions/node/v8.15.1/bin/mocha",
+            "args": [
+                "--no-timeouts",
+                "--colors",
+                "${file}",
+                "--require",
+                "ts-node/register"
+            ],
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "NODE_ENV": "test",
+                "DB_REPO": "remote"
+            },
+            "preLaunchTask": "npm: prepare"
+        },
     ]
 }

@@ -1,9 +1,46 @@
+import { RecordModel, RecordAction, DocumentPath } from "../lib/record_model";
+import { ServiceConfig } from "../lib/firebase";
+import { IsString } from "class-validator";
+import { RecordType } from "../lib/record_type";
+
+
+export const serviceConfig : ServiceConfig = {
+    devDatabaseUrl: "https://kash-base-test.firebaseio.com",
+    prodDatabaseUrl: "https://<production-db-url>.firebaseio.com",
+    localCredentialsPath: '/Users/henrisack/X509/kash-base-test-firebase-adminsdk-rcac5-a9225fd148.json'
+};
+
+RecordType.values = ["users", "devices", "accounts"].map(x => new RecordType(x))
+
 function accountIdSetter(): string {
     let id = `account_${this.ref}`
     this.code = id
     return id
 }
 
+export class Device extends RecordModel {
+    @IsString()
+    curve: string
+    pubKey: string
+    userId: string
+    verified: boolean
+    static recordType(): RecordType {
+        return new RecordType("devices")
+    }
+    static st = (path: DocumentPath) => new RecordAction(Device, path)
+}
+
+export class User extends RecordModel {
+    @IsString()
+    name: string
+    givenNames: string
+    email: string
+    static recordType(): RecordType {
+        return new RecordType("users")
+    }
+
+    static st = new RecordAction(User)
+}
 
 export const users = {
     users: {                                    // <- collection reference is "users"
@@ -42,19 +79,35 @@ export const users = {
     }
 };
 
+export class Account extends RecordModel {
+
+    code: string
+    userid: string
+    name: string
+    accountType: string
+    static recordType(): RecordType {
+        return new RecordType("accounts")
+    }
+
+    static st = new RecordAction(Account)
+}
 
 export const accounts = {
     accounts: {
         keysFn: accountIdSetter,            // <- a special keyword used to compute the document Id istead of letting firestore choose one
         acc_1234234534564567: {
             ref: 1,
+            name: "base account",
             userId: 'An5Wv3JVwSd1yAsdTHIfmqwdMEH3',
             accountType: "USER"
         },
         acc_1111_USER: {
             ref: 2,
+            name: "savings account",
             userId: 'K1f614gwr3QtQL1bS6H5GmDay9B2',
             accountType: "PREMIUM"
         }
     }
 };
+
+export default [users, accounts]
