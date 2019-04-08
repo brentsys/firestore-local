@@ -20,44 +20,42 @@ export class TestDB {
 
     constructor(fix : Fixture[]) {
         this.fixtures = new TSMap<string, any>();
-        fix.map(this.merge)
+        fix.map(el => merge.call(this, el))
         if (TestDB._keys === undefined) TestDB._keys = this.fixtures.keys()
         if (TestDB._values === undefined) TestDB._values = this.fixtures.values()
     }
+}
 
-
-    merge(data: Fixture): void {
-        for (let key of Object.keys(data)) {
-            let subData = data[key]
-            this.adapt(key, subData)
-        }
+function merge(data: Fixture): void {
+    for (let key of Object.keys(data)) {
+        let subData = data[key]
+        adapt.call(this, key, subData)
     }
+}
 
-    adapt(path: string, data: Fixture) {
-        let keysFn = data.keysFn
-        delete data.keysFn
-        for (let key of Object.keys(data)) {
-            let altKey = key
-            if (keysFn !== undefined) {
-                altKey = keysFn.call(data[key])
-            }
-            let includes = data[key].includes
-            delete data[key].includes
-            let newKey = [path, altKey].join("/")
-            this.fixtures.set(newKey, data[key]);
+function adapt(path: string, data: Fixture) {
+    let keysFn = data.keysFn
+    delete data.keysFn
+    for (let key of Object.keys(data)) {
+        let altKey = key
+        if (keysFn !== undefined) {
+            altKey = keysFn.call(data[key])
+        }
+        let includes = data[key].includes
+        delete data[key].includes
+        let newKey = [path, altKey].join("/")
+        this.fixtures.set(newKey, data[key]);
 
-            if (includes !== undefined) {
-                for (let k2 of Object.keys(includes)) {
-                    let subData = {}
-                    let subkey = [path, altKey, k2].join("/")
-                    subData[subkey] = includes[k2]
-                    this.merge(subData)
-                }
+        if (includes !== undefined) {
+            for (let k2 of Object.keys(includes)) {
+                let subData = {}
+                let subkey = [path, altKey, k2].join("/")
+                subData[subkey] = includes[k2]
+                merge.call(this, subData)
             }
         }
     }
 }
-
 export const TestFixtures = new TSMap<string, any>()
 
 export function initFixtures(fix : Fixture[]) {
