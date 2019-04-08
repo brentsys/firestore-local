@@ -3,8 +3,8 @@ export class RecordType {
     
     static values: RecordType[] = []
 
-    static setValues( keys: string[]): RecordType[]{
-        return keys.map(x => new RecordType(x))
+    static setValues( keys: string[]): void{
+        RecordType.values = keys.map(x => new RecordType(x))
     }
 
     public toString() {
