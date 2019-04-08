@@ -66,12 +66,12 @@ function _nextIndex (ref, numShards?: number) {
     });
 }
 
-function nextIndex(cfg: IDBGroupConfig, recType: string, nb?: number) {
-  db = cfg.localApp.firestore()
+function nextIndex(_db: FirestoreType, recType: string, nb?: number) {
+  db = _db
   var rf = counterReference(recType);
   return _nextIndex(rf, nb);
 };
 
-export default {
+export const Counter = {
   nextIndex: nextIndex
 };
