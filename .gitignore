@@ -59,9 +59,3 @@ typings/
 
 # next.js build output
 .next
-
-# typescript specific
-typings/
-lib/*.js
-test/*.js
-*.map
