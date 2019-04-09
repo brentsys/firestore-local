@@ -8,16 +8,8 @@ import fix, { serviceConfig } from "../test/fixtures";
 import { LocalDatabase } from "./local-firestore";
 import { RecordType } from "./record_type";
 
-let db = LocalApp.getInstance().firestore()
-
 chai.use(chaiHttp);
 
-function reInit(fn: () => any): void {
-    if (db instanceof LocalDatabase) {
-        db.reset()
-    }
-    fn()
-}
 let collections = RecordType.values.map(x => x.toString())
 
 function deleteRecursively(done) {
@@ -37,11 +29,20 @@ export interface DescriberOptions {
 
 export function desc<Q extends RecordModel>(title: string, fn: () => any, options?: DescriberOptions) {
 
-    if(RecordType.values.length === 0) console.log("\nRecordTypes.values does not seems to be set yet!..")
+
+    let db = LocalApp.getInstance().firestore()
+    function reInit(fn: () => any): void {
+        if (db instanceof LocalDatabase) {
+            db.reset()
+        }
+        fn()
+    }
+
+    if (RecordType.values.length === 0) console.log("\nRecordTypes.values does not seems to be set yet!..")
 
     describe(title, function () {
 
-        if(options!== undefined){
+        if (options !== undefined) {
             before(function () {
                 if (options.before !== undefined) options.before()
             })
@@ -52,13 +53,13 @@ export function desc<Q extends RecordModel>(title: string, fn: () => any, option
         }
 
         beforeEach(function (done) {
-            if(options !== undefined && options.beforeEach != undefined) options.beforeEach.call(this)
+            if (options !== undefined && options.beforeEach != undefined) options.beforeEach.call(this)
             if (process.env.DB_REPO !== "remote") return done()
             uploadSeedData(db, fix)
                 .then(() => done())
         })
         afterEach(function (done) {
-            if(options !== undefined && options.afterEach != undefined) options.afterEach.call(this)
+            if (options !== undefined && options.afterEach != undefined) options.afterEach.call(this)
             if (process.env.DB_REPO !== "remote") return reInit(done)
             let promises = collections.map(coll => deleteCollection(db, coll, 500))
             Promise.all(promises)
