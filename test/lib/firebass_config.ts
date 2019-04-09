@@ -10,3 +10,5 @@ const serviceConfig : ServiceConfig = {
 LocalApp.init(serviceConfig, [users, accounts])
 
 export default LocalApp.getInstance()
+
+export const AppConfig = (debug?: number) => LocalApp.getDbGroup(debug)

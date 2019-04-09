@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import localApp from "./firebase"
+import localApp from "./firebass_config"
 import { Counter } from "../../index";
 
 let ref = "dummies"

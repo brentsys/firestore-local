@@ -1,13 +1,14 @@
 import { expect } from "chai";
-import { LocalApp } from "../../index";
 import fix, { User, Device } from '../fixtures'
 import { getTestRecord } from "../../db/test_db";
 import { DocumentPath } from "../../lib/record_model";
 import { desc } from "../../lib/describer";
+import localApp , {AppConfig } from "./firebass_config"
+
 
 desc('RecordModel', function () {
 
-    let cfg = LocalApp.getDbGroup()
+    let cfg = AppConfig()
 
     let userId = "An5Wv3JVwSd1yAsdTHIfmqwdMEH3"
     let attributes = { name: "new Demo Company" }
@@ -32,7 +33,7 @@ desc('RecordModel', function () {
             })
     })
     it("should update document", function (done) {
-        User.st.setConfig(LocalApp.getDbGroup())
+        User.st.setConfig(cfg)
         User.st.findById(userId)
             .then(usr => {
                 return usr.updateData(attributes, cfg)

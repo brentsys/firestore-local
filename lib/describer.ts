@@ -4,10 +4,9 @@ import { RecordModel } from "./record_model";
 import chai = require('chai')
 import chaiHttp = require('chai-http');
 import { LocalApp } from "..";
-import fix from "../test/fixtures";
+import fix, { serviceConfig } from "../test/fixtures";
 import { LocalDatabase } from "./local-firestore";
 import { RecordType } from "./record_type";
-
 
 let db = LocalApp.getInstance().firestore()
 
