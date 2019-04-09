@@ -7,3 +7,4 @@ __export(require("./lib/firebase"));
 __export(require("./lib/counter"));
 __export(require("./lib/record_model"));
 __export(require("./lib/record_type"));
+__export(require("./lib/describer"));

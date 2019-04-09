@@ -59,7 +59,9 @@ function initFixtures(fix) {
     }
 }
 exports.initFixtures = initFixtures;
-function getTestRecord(fix, docPath) {
+function getTestRecord(docPath, fix) {
+    if (fix === undefined)
+        fix = [];
     if (exports.TestFixtures.length == 0)
         initFixtures(fix);
     let path = docPath.join("/");

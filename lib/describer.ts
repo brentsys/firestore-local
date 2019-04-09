@@ -1,15 +1,14 @@
 import { uploadSeedData, recursiveDelete, deleteCollection } from "./firestore_upload"
 
-import { expect } from 'chai';
 import { RecordModel } from "./record_model";
 import chai = require('chai')
 import chaiHttp = require('chai-http');
 import { LocalApp } from "..";
-import fix, { serviceConfig } from "../test/fixtures";
+import fix from "../test/fixtures";
 import { LocalDatabase } from "./local-firestore";
 import { RecordType } from "./record_type";
 
-LocalApp.init(serviceConfig, fix)
+
 let db = LocalApp.getInstance().firestore()
 
 chai.use(chaiHttp);

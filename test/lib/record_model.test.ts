@@ -14,7 +14,7 @@ desc('RecordModel', function () {
 
     let devicePath = ["users", "K1f614gwr3QtQL1bS6H5GmDay9B2", "devices", "Bgn6nAp7tzUSqqhqvGIe"]
 
-    let deviceData = getTestRecord(fix, devicePath)
+    let deviceData = getTestRecord(devicePath, fix)
 
     it("should find device", function(done){
         let st = Device.st(new DocumentPath(devicePath.slice(-3)[0], devicePath.slice(0,1)))

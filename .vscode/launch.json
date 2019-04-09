@@ -45,5 +45,25 @@
             },
             "preLaunchTask": "npm: prepare"
         },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha All",
+            "program": "/Users/henrisack/.nvm/versions/node/v8.15.1/bin/mocha",
+            "args": [
+                "-r",
+                "ts-node/register",
+                "--no-timeouts",
+                "--colors",
+                "${workspaceFolder}/test/**/*.test.ts"
+            ],
+            "internalConsoleOptions": "neverOpen",
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "env": {
+                "NODE_ENV": "test"
+            },
+            "preLaunchTask": "npm: prepare"
+        }
     ]
 }
