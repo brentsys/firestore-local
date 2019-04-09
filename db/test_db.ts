@@ -67,7 +67,8 @@ export function initFixtures(fix : Fixture[]) {
 }
 
 
-export function getTestRecord(fix : Fixture[], docPath: string[]): Fixture {
+export function getTestRecord(docPath: string[], fix? : Fixture[], ): Fixture {
+    if(fix === undefined) fix = []
     if (TestFixtures.length == 0) initFixtures(fix)
     let path = docPath.join("/")
     let value = TestFixtures.get(path)
