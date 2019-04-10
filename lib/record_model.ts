@@ -44,9 +44,10 @@ export class RecordAction<Q extends RecordModel> {
         return base
     }
 
-    setConfig(cfg: IDBGroupConfig) {
+    setConfig(cfg: IDBGroupConfig): RecordAction<Q> {
         this.config = cfg
         if(cfg.debug !== undefined) this.debug = cfg.debug
+        return this
     }
 
     getConfig(): IDBGroupConfig{

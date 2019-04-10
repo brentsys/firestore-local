@@ -47,8 +47,10 @@ export function desc<Q extends RecordModel>(title: string, fn: () => any, option
                 if (options.before !== undefined) options.before()
             })
             after(function (done) {
-                if (options.after !== undefined) options.after()
-                deleteRecursively(done)
+                if (options.after !== undefined) {
+                    options.after()
+                    if (process.env.DB_REPO === "remote") deleteRecursively(done)
+                }
             })
         }
 

@@ -2,9 +2,21 @@ import { expect } from "chai";
 import fix, { User, Device } from '../fixtures'
 import { getTestRecord } from "../../db/test_db";
 import { DocumentPath } from "../../lib/record_model";
-import { desc } from "../../lib/describer";
+import { desc, DescriberOptions } from "../../lib/describer";
 import localApp , {AppConfig } from "./firebass_config"
 
+function beforeTest(){
+}
+
+function afterTest(){
+}
+
+let options : DescriberOptions = {
+    beforeEach: beforeTest,
+    afterEach: afterTest,
+    before: beforeTest,
+    after: afterTest
+}
 
 desc('RecordModel', function () {
 
@@ -62,4 +74,4 @@ desc('RecordModel', function () {
             .then(() => done())
             .catch(done)
     })
-})
+}, options)
