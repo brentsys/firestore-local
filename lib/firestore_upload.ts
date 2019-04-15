@@ -1,15 +1,25 @@
 import { LocalApp } from "./firebase";
 
-import firebase_tools from 'firebase-tools' ;
+//import firebase_tools from 'firebase-tools' ;
 import { TestDB, initFixtures, TestFixtures } from '../db/test_db';
 import { Fixture } from './local-firestore';
+import { RecordType } from "./record_type";
 
-export function recursiveDelete(path: string): Promise<void> {
-  return firebase_tools.firestore.delete(path, {
-    project: process.env.GCLOUD_PROJECT,
-    recursive: true,
-    yes: true
-  })
+const firebase_tools = require('firebase-tools');
+
+export function recursiveDelete(done): Promise<any[]> {
+  let mapper = (x: RecordType) => {
+    return firebase_tools.firestore.delete(x.toString(), {
+      project: process.env.GCLOUD_PROJECT,
+      recursive: true,
+      yes: true
+    })
+    .catch(error => {
+      console.log("---- error", error)
+      return Promise.resolve()
+    })
+  } 
+  return Promise.all(RecordType.values.map(mapper))
 }
 
 

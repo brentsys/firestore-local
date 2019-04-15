@@ -1,6 +1,10 @@
+process.env.GCLOUD_PROJECT = "kash-base-test"
 import { expect } from "chai";
 import localApp from "./firebass_config"
-import { Counter } from "../../index";
+import { Counter, desc } from "../../index";
+import fix from '../fixtures'
+import { RecordType } from "../../lib/record_type";
+import { setFixtures } from "../../lib/describer";
 
 let ref = "dummies"
 
@@ -11,7 +15,11 @@ const failure  = (res: any, error: Error) => {
     return Promise.reject(error)
 }
 
-describe("Counter", function () {
+RecordType.values.push(new RecordType("counters"))
+
+setFixtures(fix)
+
+desc("Counter", function () {
     let db = localApp.firestore()
 
     it("should create counter on the fly", function (done) {

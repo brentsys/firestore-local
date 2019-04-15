@@ -1,8 +1,9 @@
+process.env.GCLOUD_PROJECT = "kash-base-test"
 import { expect } from "chai";
 import fix, { User, Device } from '../fixtures'
 import { getTestRecord } from "../../db/test_db";
 import { DocumentPath } from "../../lib/record_model";
-import { desc, DescriberOptions } from "../../lib/describer";
+import { desc, DescriberOptions, setFixtures } from "../../lib/describer";
 import localApp , {AppConfig } from "./firebass_config"
 
 function beforeTest(){
@@ -17,6 +18,8 @@ let options : DescriberOptions = {
     before: beforeTest,
     after: afterTest
 }
+
+setFixtures(fix)
 
 desc('RecordModel', function () {
 

@@ -4,19 +4,15 @@ import { RecordModel } from "./record_model";
 import chai = require('chai')
 import chaiHttp = require('chai-http');
 import { LocalApp } from "..";
-import fix, { serviceConfig } from "../test/fixtures";
-import { LocalDatabase } from "./local-firestore";
+import { LocalDatabase, Fixture } from "./local-firestore";
 import { RecordType } from "./record_type";
 
 chai.use(chaiHttp);
 
-let collections = RecordType.values.map(x => x.toString())
-
-function deleteRecursively(done) {
-    let promises = collections.map(recursiveDelete)
-    Promise.all(promises)
-        .then(() => done())
+if (process.env.DB_REPO === "remote" && process.env.GCLOUD_PROJECT === undefined) {
+    throw new Error("Please set GCLOUD_PROJECT env.variable to proceed with remote firestore")
 }
+
 
 type Fn = () => any
 
@@ -27,7 +23,14 @@ export interface DescriberOptions {
     afterEach?: Fn
 }
 
+let fix: any
+
+export function setFixtures(_fix: any){
+    fix = _fix
+}
+
 export function desc<Q extends RecordModel>(title: string, fn: () => any, options?: DescriberOptions) {
+
 
 
     let db = LocalApp.getInstance().firestore()
@@ -41,18 +44,18 @@ export function desc<Q extends RecordModel>(title: string, fn: () => any, option
     if (RecordType.values.length === 0) console.log("\nRecordTypes.values does not seems to be set yet!..")
 
     describe(title, function () {
+        if (options === undefined) options = {}
 
-        if (options !== undefined) {
-            before(function () {
-                if (options.before !== undefined) options.before.call(this)
-            })
-            after(function (done) {
-                if (options.after !== undefined) {
-                    options.after.call(this)
-                    if (process.env.DB_REPO === "remote") deleteRecursively(done)
-                }
-            })
-        }
+        before(function () {
+            if (options.before !== undefined) options.before.call(this)
+        })
+        after(function (done) {
+            if (options.after !== undefined) {
+                options.after.call(this)
+            }
+            if (process.env.DB_REPO === "remote") recursiveDelete(done)
+        })
+
 
         beforeEach(function (done) {
             if (options !== undefined && options.beforeEach != undefined) options.beforeEach.call(this)
@@ -63,7 +66,7 @@ export function desc<Q extends RecordModel>(title: string, fn: () => any, option
         afterEach(function (done) {
             if (options !== undefined && options.afterEach != undefined) options.afterEach.call(this)
             if (process.env.DB_REPO !== "remote") return reInit(done)
-            let promises = collections.map(coll => deleteCollection(db, coll, 500))
+            let promises = RecordType.values.map(x => deleteCollection(db, x.toString(), 500))
             Promise.all(promises)
                 .then(() => done())
         })

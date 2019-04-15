@@ -2,9 +2,9 @@ import { ServiceConfig, LocalApp } from '../../lib/firebase';
 import {users, accounts} from "../fixtures";
 
 const serviceConfig : ServiceConfig = {
-    devDatabaseUrl: "https://<DEV-PROJECT-ID>.firebaseio.com",
     prodDatabaseUrl: "https://<PROD-PROJECT-ID>.firebaseio.com",
-    localCredentialsPath: 'someFilePath'
+    devDatabaseUrl: "https://kash-base-test.firebaseio.com",
+    localCredentialsPath: '/Users/henrisack/X509/kash-base-test-firebase-adminsdk-rcac5-a9225fd148.json'
 };
 
 LocalApp.init(serviceConfig, [users, accounts])

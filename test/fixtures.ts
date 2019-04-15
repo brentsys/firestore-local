@@ -10,7 +10,7 @@ export const serviceConfig : ServiceConfig = {
     localCredentialsPath: '/Users/henrisack/X509/kash-base-test-firebase-adminsdk-rcac5-a9225fd148.json'
 };
 
-RecordType.values = ["users", "devices", "accounts"].map(x => new RecordType(x))
+//RecordType.values = ["users", "devices", "accounts", "counters"].map(x => new RecordType(x))
 
 function accountIdSetter(): string {
     let id = `account_${this.ref}`
