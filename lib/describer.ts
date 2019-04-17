@@ -29,6 +29,12 @@ export function setFixtures(_fix: any){
     fix = _fix
 }
 
+let noDelete = false
+
+export function noDeleteDatabase(res?: boolean){
+    if(res ===  undefined) res = true
+    noDelete = res
+}
 export function desc<Q extends RecordModel>(title: string, fn: () => any, options?: DescriberOptions) {
 
 
@@ -53,7 +59,7 @@ export function desc<Q extends RecordModel>(title: string, fn: () => any, option
             if (options.after !== undefined) {
                 options.after.call(this)
             }
-            if (process.env.DB_REPO === "remote") recursiveDelete(done)
+            if (process.env.DB_REPO === "remote" && !noDelete) recursiveDelete(done)
         })
 
 
@@ -65,7 +71,7 @@ export function desc<Q extends RecordModel>(title: string, fn: () => any, option
         })
         afterEach(function (done) {
             if (options !== undefined && options.afterEach != undefined) options.afterEach.call(this)
-            if (process.env.DB_REPO !== "remote") return reInit(done)
+            if (process.env.DB_REPO !== "remote" && !noDelete) return reInit(done)
             let promises = RecordType.values.map(x => deleteCollection(db, x.toString(), 500))
             Promise.all(promises)
                 .then(() => done())

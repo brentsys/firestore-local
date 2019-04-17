@@ -238,7 +238,7 @@ export abstract class RecordModel {
     }
 
     set(cfg: IDBGroupConfig, data: DocumentData): Promise<void>{
-        return (this.getDocumentRef(cfg) as any).set(data)
+        return (this.getDocumentRef(cfg) as any).set(data, {merge: true})
     }
 
     validate(model: any): Promise<any> {
