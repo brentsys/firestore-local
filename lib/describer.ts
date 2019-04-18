@@ -60,6 +60,7 @@ export function desc<Q extends RecordModel>(title: string, fn: () => any, option
                 options.after.call(this)
             }
             if (process.env.DB_REPO === "remote" && !noDelete) recursiveDelete(done)
+            else done()
         })
 
 
