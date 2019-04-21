@@ -1,13 +1,9 @@
 import { uploadSeedData, recursiveDelete, deleteCollection } from "./firestore_upload"
 
 import { RecordModel } from "./record_model";
-import chai = require('chai')
-import chaiHttp = require('chai-http');
 import { LocalApp } from "..";
 import { LocalDatabase, Fixture } from "./local-firestore";
 import { RecordType } from "./record_type";
-
-chai.use(chaiHttp);
 
 if (process.env.DB_REPO === "remote" && process.env.GCLOUD_PROJECT === undefined) {
     throw new Error("Please set GCLOUD_PROJECT env.variable to proceed with remote firestore")

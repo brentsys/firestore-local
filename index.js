@@ -8,3 +8,5 @@ __export(require("./lib/counter"));
 __export(require("./lib/record_model"));
 __export(require("./lib/record_type"));
 __export(require("./lib/describer"));
+__export(require("./lib/firestore_upload"));
+__export(require("./db/test_db"));
