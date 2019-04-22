@@ -107,7 +107,10 @@ export function seedFixtures(db: FirestoreType, fix: TSMap<string, any>) : Promi
         let coll = array.slice(0, -1).join("/")
         let id = array.slice(-1).join("/")
         return (db.collection(coll).doc(id) as any).set(fix.get(key), {merge: true})
-            .then(()=> Promise.resolve())
+            .then(res => {
+                console.log("set result:", res)
+                return Promise.resolve()
+            })
     }
     return Promise.all(fix.keys().map(mapper)).then(()=> Promise.resolve())
 }
