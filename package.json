@@ -1,6 +1,6 @@
 {
   "name": "firestore-local",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Local emulation of Firestore",
   "main": "index.js",
   "scripts": {
