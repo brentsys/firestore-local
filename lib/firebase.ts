@@ -101,6 +101,7 @@ export class LocalApp implements ILocalApp {
 }
 
 export function seedFixtures(cfg: IDBGroupConfig, fix: TSMap<string, any>) : Promise<void>{
+    if(LocalApp.getInstance() === undefined) LocalApp.init(cfg, [])
     let mapper = (key: string) => {
         let array = key.split("/")
         if(array.length % 2 > 0) return Promise.reject(new Error("Key should have even paths"))
