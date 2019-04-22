@@ -184,6 +184,18 @@ export class DocumentPath implements IDocumentPath {
 
 export abstract class RecordModel {
 
+    protected setTimestamp(elements?: string[]){
+        if(elements === undefined) elements = ["createdAt"]
+        for(let elm of elements){
+            let target = this[elm]
+            if(target !== undefined && target._seconds !== undefined){
+                if(target.toMillis === undefined){
+                    this[elm] = new Timestamp(target._seconds, target._nanoseconds)
+                }
+            }
+        }
+    }
+
     createdAt: Timestamp
     id: string | undefined
     private errors: string[] = []
