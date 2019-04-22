@@ -32,7 +32,7 @@ export interface IDBGroupConfig {
 let localApp: LocalApp
 
 export class LocalAuth {
-    constructor(private db: FirestoreType) { }
+    constructor(protected db: FirestoreType) { }
 }
 
 
