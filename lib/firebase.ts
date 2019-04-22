@@ -3,6 +3,7 @@ import { fake, LocalDatabase, Fixture } from './local-firestore';
 import * as Firestore from '@google-cloud/firestore';
 import { TSMap } from 'typescript-map';
 
+const DEFAULT = "default"
 export type FirestoreType = fake.Database | Firestore.Firestore
 
 export interface ILocalApp {
@@ -40,8 +41,8 @@ export class LocalAuth {
 
 
 export class LocalApp implements ILocalApp {
-    private static instance: LocalApp
-    private static serviceConfig: ServiceConfig
+    private static serviceConfig: {[key: string]: ServiceConfig} = {}
+    private static service: {[key: string]: LocalApp} = {}
 
     private _auth: LocalAuth
     
@@ -49,41 +50,58 @@ export class LocalApp implements ILocalApp {
         this._auth = new LocalAuth(_db)
     }
 
-
-    static getInstance(): LocalApp {
-        return LocalApp.instance
+    private static setServiceConfig(scfg: ServiceConfig, name?: string):void{
+        if(name === undefined) name = DEFAULT
+        LocalApp.serviceConfig[name] = scfg
     }
 
-    static getDbGroup(debug? : number): IDBGroupConfig {
+    private static setInstance(inst: LocalApp, name?: string):void{
+        if(name === undefined) name = DEFAULT
+        LocalApp.service[name] = inst
+    }
+
+
+    static getInstance(name?: string): LocalApp {
+        if(name === undefined) name = DEFAULT
+        return LocalApp.service[name]
+    }
+
+    static getDbGroup(debug? : number, name?: string): IDBGroupConfig {
+        if(name === undefined) name = DEFAULT
         return {
-            localApp: LocalApp.instance,
-            getDatabase: LocalApp.getInstance().firestore,
+            localApp: LocalApp.getInstance(name),
+            getDatabase: LocalApp.getInstance(name).firestore,
             debug: debug
         }
     }
-    static init(sCfg, fix: Fixture[]): void {
-        if (LocalApp.instance !== undefined) throw new Error("Service already initialized")
-        LocalApp.serviceConfig = sCfg
-        LocalApp.instance = LocalApp.makeLocalApp(fix)
+    static init(sCfg, fix: Fixture[], name?: string): void {
+        if (LocalApp.getInstance(name) !== undefined) throw new Error("Service already initialized")
+        LocalApp.setServiceConfig(sCfg, name)
+        LocalApp.setInstance(LocalApp.makeLocalApp(fix, name), name)
     }
 
-    static makeLocalApp(fix: Fixture[]): LocalApp {
+    static makeLocalApp(fix: Fixture[], name?: string): LocalApp {
+        if(name === undefined) name = DEFAULT
         if (process.env.NODE_ENV == 'production') {
+            let credential = admin.credential.applicationDefault()
+            if(name !== DEFAULT){
+                credential = require(LocalApp.serviceConfig[name].localCredentialsPath);
+            }
             /*
             * use the code below when deplying to GAE
             */
             let app = admin.initializeApp({
-                credential: admin.credential.applicationDefault(),
-                databaseURL: LocalApp.serviceConfig.prodDatabaseUrl
+                credential: credential,
+                databaseURL: LocalApp.serviceConfig[name].prodDatabaseUrl
             });
             return new LocalApp(app.firestore())
         } else {
             if (process.env.DB_REPO == 'remote') {
-                var serviceAccount = require(LocalApp.serviceConfig.localCredentialsPath);
+                var serviceAccount = require(LocalApp.serviceConfig[name].localCredentialsPath);
     
                 var defaultAppConfig = {
                     credential: admin.credential.cert(serviceAccount),
-                    databaseURL: LocalApp.serviceConfig.devDatabaseUrl
+                    databaseURL: LocalApp.serviceConfig[name].devDatabaseUrl
                 };
                 // Initialize the default app
                 return new LocalApp(admin.initializeApp(defaultAppConfig).firestore())
