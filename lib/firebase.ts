@@ -33,6 +33,9 @@ let localApp: LocalApp
 
 export class LocalAuth {
     constructor(protected db: FirestoreType) { }
+    verifyIdToken(token: string, checkRevoked?: boolean): Promise<admin.auth.DecodedIdToken> {
+        return Promise.reject(new Error("verifyIdToken not implemented"))
+    }
 }
 
 
