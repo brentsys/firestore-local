@@ -82,35 +82,41 @@ export class LocalApp implements ILocalApp {
 
     static makeLocalApp(fix: Fixture[], name?: string): LocalApp {
         if(name === undefined) name = DEFAULT
-        if (process.env.NODE_ENV == 'production') {
-            let credential = admin.credential.applicationDefault()
-            if(name !== DEFAULT){
-                credential = require(LocalApp.serviceConfig[name].localCredentialsPath);
-            }
-            /*
-            * use the code below when deplying to GAE
-            */
+        if(name === DEFAULT){
+            if (process.env.NODE_ENV == 'production') {
+                /*
+                * use the code below when deplying to GAE
+                */
+                let app = admin.initializeApp({
+                    credential: admin.credential.applicationDefault(),
+                    databaseURL: LocalApp.serviceConfig[name].prodDatabaseUrl
+                });
+                return new LocalApp(app.firestore())
+            } else {
+                if (process.env.DB_REPO == 'remote') {
+                    let serviceAccount = require(LocalApp.serviceConfig[name].localCredentialsPath);
+        
+                    var defaultAppConfig = {
+                        credential: admin.credential.cert(serviceAccount),
+                        databaseURL: LocalApp.serviceConfig[name].devDatabaseUrl
+                    };
+                    // Initialize the default app
+                    return new LocalApp(admin.initializeApp(defaultAppConfig).firestore())
+        
+                } else {
+                    let localFirestore = new LocalDatabase(fix)
+                    return new LocalApp(localFirestore)
+                }
+            }            
+        } else {
+            let serviceAccount = require(LocalApp.serviceConfig[name].localCredentialsPath);
             let app = admin.initializeApp({
-                credential: credential,
+                credential: admin.credential.cert(serviceAccount),
                 databaseURL: LocalApp.serviceConfig[name].prodDatabaseUrl
             });
             return new LocalApp(app.firestore())
-        } else {
-            if (process.env.DB_REPO == 'remote') {
-                var serviceAccount = require(LocalApp.serviceConfig[name].localCredentialsPath);
-    
-                var defaultAppConfig = {
-                    credential: admin.credential.cert(serviceAccount),
-                    databaseURL: LocalApp.serviceConfig[name].devDatabaseUrl
-                };
-                // Initialize the default app
-                return new LocalApp(admin.initializeApp(defaultAppConfig).firestore())
-    
-            } else {
-                let localFirestore = new LocalDatabase(fix)
-                return new LocalApp(localFirestore)
-            }
         }
+
     }
 
     firestore(): FirestoreType {
