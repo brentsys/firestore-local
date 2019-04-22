@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import { fake, LocalDatabase, Fixture } from './local-firestore';
 import * as Firestore from '@google-cloud/firestore';
+import { TSMap } from 'typescript-map';
 
 export type FirestoreType = fake.Database | Firestore.Firestore
 
@@ -99,5 +100,16 @@ export class LocalApp implements ILocalApp {
     }
 }
 
+export function seedFixtures(cfg: IDBGroupConfig, fix: TSMap<string, any>) : Promise<void>{
+    let mapper = (key: string) => {
+        let array = key.split("/")
+        if(array.length % 2 > 0) return Promise.reject(new Error("Key should have even paths"))
+        let coll = array.slice(0, -1).join("/")
+        let id = array.slice(-1).join("/")
+        return (cfg.getDatabase().collection(coll).doc(id) as any).set(fix.get(key), {merge: true})
+            .then(()=> Promise.resolve())
+    }
+    return Promise.all(fix.keys().map(mapper)).then(()=> Promise.resolve())
+}
 
 
