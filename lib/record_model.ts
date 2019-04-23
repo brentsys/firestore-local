@@ -6,6 +6,7 @@ import { AuthError } from './auth_error';
 import { validate } from "class-validator";
 import { RecordType } from "./record_type";
 
+const NotSavedKeys = ["modelType", "errors", "collectionPath"]
 
 type CollectionReference = fake.CollectionReference | admin.firestore.CollectionReference;
 export type DocReference = fake.DocumentReference | admin.firestore.DocumentReference;
@@ -24,8 +25,8 @@ export class RecordAction<Q extends RecordModel> {
     debug: number;
     documentPath: DocumentPath
     constructor(readonly creator: ModelCreator<Q>, reference?: DocumentPath | Q) {
-        if(reference instanceof DocumentPath) this.documentPath = reference
-        if(reference instanceof RecordModel) this.documentPath = reference.getDocumentPath()
+        if (reference instanceof DocumentPath) this.documentPath = reference
+        if (reference instanceof RecordModel) this.documentPath = reference.getDocumentPath()
         this.debug = 0
     }
 
@@ -46,20 +47,20 @@ export class RecordAction<Q extends RecordModel> {
 
     setConfig(cfg: IDBGroupConfig): RecordAction<Q> {
         this.config = cfg
-        if(cfg.debug !== undefined) this.debug = cfg.debug
+        if (cfg.debug !== undefined) this.debug = cfg.debug
         return this
     }
 
-    getConfig(): IDBGroupConfig{
+    getConfig(): IDBGroupConfig {
         return this.config
     }
 
     getCollection(cfg?: IDBGroupConfig): CollectionReference {
-        if(cfg !== undefined) this.setConfig(cfg)
+        if (cfg !== undefined) this.setConfig(cfg)
         return this.newRecord().collection(this.config)
     }
 
-    add(data: DocumentData, cfg?: IDBGroupConfig): Promise<Q>{
+    add(data: DocumentData, cfg?: IDBGroupConfig): Promise<Q> {
         //data.id = "new"
         let rec = this.setSyncData(data as DataModel)
         return rec.save(cfg)
@@ -72,10 +73,10 @@ export class RecordAction<Q extends RecordModel> {
             let { field, comp, value } = query
             collRef = collRef.where(field, comp, value)
         }
-        if(order !== undefined) {
+        if (order !== undefined) {
             collRef.orderBy(order.fieldPath, order.directionStr)
         }
-        if(this.debug >0) console.log(`[debug-${this.debug}]collRef =>`, collRef)
+        if (this.debug > 0) console.log(`[debug-${this.debug}]collRef =>`, collRef)
         return collRef
             .get()
             .then(function (querySnapshot) {
@@ -98,18 +99,18 @@ export class RecordAction<Q extends RecordModel> {
         var qs = this.getCollection() as any
         for (var query of queries) {
             let { field, comp, value } = query
-            if(this.debug > 2) console.log(`[debug-${this.debug}]`,"field =>", field, "(",typeof field,") - value =>", value, "(", typeof value, ")")
+            if (this.debug > 2) console.log(`[debug-${this.debug}]`, "field =>", field, "(", typeof field, ") - value =>", value, "(", typeof value, ")")
             qs = qs.where(field, comp, value);
         }
-        if(order !== undefined) {
+        if (order !== undefined) {
             qs.orderBy(order.fieldPath, order.directionStr)
         }
         let recordAction = this
-        if(this.debug > 0) console.log(`[debug-${this.debug}]`,"qs =>", qs)
+        if (this.debug > 0) console.log(`[debug-${this.debug}]`, "qs =>", qs)
         return qs
             .get()
             .then(function (querySnapshot) {
-                if(rm.debug > 1) console.log(`[debug-${rm.debug}]`,"found ", querySnapshot.docs.length, "elements")
+                if (rm.debug > 1) console.log(`[debug-${rm.debug}]`, "found ", querySnapshot.docs.length, "elements")
                 var result: Promise<RecordModel>[] = [];
                 for (var i = 0; i < querySnapshot.docs.length; i++) {
                     var doc = querySnapshot.docs[i];
@@ -144,8 +145,8 @@ export class DocumentPath implements IDocumentPath {
     }
 
     getParentDocumentPath(): DocumentPath | undefined {
-        if(this.collectionPath.length < 3 ) return undefined
-        return new DocumentPath(this.collectionPath.slice(-2,-1)[0], this.collectionPath.slice(0, -2))
+        if (this.collectionPath.length < 3) return undefined
+        return new DocumentPath(this.collectionPath.slice(-2, -1)[0], this.collectionPath.slice(0, -2))
     }
 
     subDocumentPath(subDocPath: DocumentPath): DocumentPath {
@@ -170,9 +171,9 @@ export class DocumentPath implements IDocumentPath {
 
     getRecordModel<Q extends RecordModel, T extends ModelCreator<Q>>(cfg: IDBGroupConfig, creator: T): Promise<Q> {
         let record = new creator(creator.recordType())
-        return (this.getDocumentRef(cfg) as any ).get()
+        return (this.getDocumentRef(cfg) as any).get()
             .then(docRef => {
-                if(!docRef.exists) return Promise.reject(new Error("Internal Error - invalid document"))
+                if (!docRef.exists) return Promise.reject(new Error("Internal Error - invalid document"))
                 let data = docRef.data()
                 data.id = this.id
                 data.collectionPath = this.collectionPath
@@ -184,12 +185,12 @@ export class DocumentPath implements IDocumentPath {
 
 export abstract class RecordModel {
 
-    protected setTimestamp(elements?: string[]){
-        if(elements === undefined) elements = ["createdAt"]
-        for(let elm of elements){
+    protected setTimestamp(elements?: string[]) {
+        if (elements === undefined) elements = ["createdAt"]
+        for (let elm of elements) {
             let target = this[elm]
-            if(target !== undefined && target._seconds !== undefined){
-                if(target.toMillis === undefined){
+            if (target !== undefined && target._seconds !== undefined) {
+                if (target.toMillis === undefined) {
                     this[elm] = new Timestamp(target._seconds, target._nanoseconds)
                 }
             }
@@ -209,10 +210,10 @@ export abstract class RecordModel {
             this.collectionPath = [table]
         } else {
             let documentPath: DocumentPath
-            if(docModel instanceof DocumentPath){
+            if (docModel instanceof DocumentPath) {
                 documentPath = docModel
             }
-            if(docModel instanceof RecordModel) {
+            if (docModel instanceof RecordModel) {
                 documentPath = docModel.getDocumentPath()
             }
             this.collectionPath = documentPath.collectionPath.concat([documentPath.id, table])
@@ -236,7 +237,7 @@ export abstract class RecordModel {
     }
 
     getDocumentPath(): DocumentPath {
-        if(this.collectionPath === undefined) this.collectionPath = []
+        if (this.collectionPath === undefined) this.collectionPath = []
         return new DocumentPath(this.id, this.collectionPath)
     }
 
@@ -249,8 +250,8 @@ export abstract class RecordModel {
         }
     }
 
-    set(cfg: IDBGroupConfig, data: DocumentData): Promise<void>{
-        return (this.getDocumentRef(cfg) as any).set(data, {merge: true})
+    set(cfg: IDBGroupConfig, data: DocumentData): Promise<void> {
+        return (this.getDocumentRef(cfg) as any).set(data, { merge: true })
     }
 
     validate(model: any): Promise<any> {
@@ -289,7 +290,7 @@ export abstract class RecordModel {
     reload<T extends RecordModel>(cfg: IDBGroupConfig): Promise<T> {
         return (this.getDocumentRef(cfg) as any).get()
             .then(docRef => {
-                if(!docRef.exists) return Promise.reject(new Error("Record not found"))
+                if (!docRef.exists) return Promise.reject(new Error("Record not found"))
                 this.assign(docRef.data())
                 return Promise.resolve(this)
             })
@@ -307,6 +308,11 @@ export abstract class RecordModel {
     }
 
     protected beforeUpdate(cfg: IDBGroupConfig, data: DocumentData): Promise<DocumentData> {
+        return Promise.resolve(data)
+    }
+
+    protected beforeSave(cfg: IDBGroupConfig, data: DocumentData): Promise<DocumentData> {
+        NotSavedKeys.forEach(x => delete data[x])
         return Promise.resolve(data)
     }
 
@@ -328,7 +334,7 @@ export abstract class RecordModel {
         return Promise.resolve(result)
     }
 
-    protected setRecordId(): string | undefined{
+    protected setRecordId(): string | undefined {
         return undefined
     }
 
@@ -339,6 +345,7 @@ export abstract class RecordModel {
         let model = this
         let newData: DocumentData
         return this.beforeUpdate(cfg, data)
+            .then(_data => this.beforeSave(cfg, _data))
             .then(xData => {
                 newData = xData
                 this.assign(newData)
@@ -359,13 +366,14 @@ export abstract class RecordModel {
         let coll = this.collection(cfg) as any
         let id: string
         return this.beforeCreate(cfg, data)
+            .then(_data => this.beforeSave(cfg, _data))
             .then(data => {
                 this.assign(data)
                 return this.validate(this)
             })
             .then(model => {
                 id = this.setRecordId()
-                if(id ===  undefined) return coll.add(model.data())
+                if (id === undefined) return coll.add(model.data())
                 let doc = coll.doc(id)
                 return coll.doc(id).set(model.data())
             })
