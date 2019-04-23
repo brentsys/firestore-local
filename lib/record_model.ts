@@ -272,6 +272,7 @@ export abstract class RecordModel {
             return acc
         }
         let result = attributes.reduce(reducer, {})
+        NotSavedKeys.forEach(x => delete result[x])
         return result
     }
 
@@ -312,7 +313,6 @@ export abstract class RecordModel {
     }
 
     protected beforeSave(cfg: IDBGroupConfig, data: DocumentData): Promise<DocumentData> {
-        NotSavedKeys.forEach(x => delete data[x])
         return Promise.resolve(data)
     }
 
