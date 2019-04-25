@@ -113,7 +113,7 @@ export class LocalApp implements ILocalApp {
             let app = admin.initializeApp({
                 credential: admin.credential.cert(serviceAccount),
                 databaseURL: LocalApp.serviceConfig[name].prodDatabaseUrl
-            });
+            }, name);
             return new LocalApp(app.firestore())
         }
 

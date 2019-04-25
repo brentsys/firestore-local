@@ -63,6 +63,10 @@ export function desc<Q extends RecordModel>(title: string, fn: () => any, option
         beforeEach(function (done) {
             if (options !== undefined && options.beforeEach != undefined) options.beforeEach.call(this)
             if (process.env.DB_REPO !== "remote") return done()
+            if(fix === undefined) {
+                console.log("fixtures to upload are not yet set!\nUse 'setFixtures' somewhere on top of your test file to set it up");
+                return done()
+            }
             uploadSeedData(db, fix)
                 .then(() => done())
         })
