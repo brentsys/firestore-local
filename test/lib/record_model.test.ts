@@ -5,6 +5,8 @@ import { getTestRecord } from "../../db/test_db";
 import { DocumentPath } from "../../lib/record_model";
 import { desc, DescriberOptions, setFixtures } from "../../lib/describer";
 import localApp , {AppConfig } from "./firebass_config"
+import { Dummy } from "./Dummy";
+import { RecordType } from "../../lib/record_type";
 
 function beforeTest(){
 }
@@ -76,5 +78,21 @@ desc('RecordModel', function () {
             })
             .then(() => done())
             .catch(done)
+    })
+    it("should not save document with custom prototypes", function(done){
+        let dummy = Dummy.st.setSyncData({id: 'new', field: new RecordType("alpha")})
+        let positivefailure = true
+        dummy.save(cfg)
+            .then(()=> {
+                positivefailure = false
+                return Promise.reject(new Error("should not save with custom prototypes"))
+            })
+            .catch(error => {
+                if(positivefailure) return Promise.resolve()
+                else return Promise.reject(error)
+            })
+            .then(done)
+            .catch(done)
+
     })
 }, options)

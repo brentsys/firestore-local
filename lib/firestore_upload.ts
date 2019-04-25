@@ -27,7 +27,11 @@ export function uploadSeedData (db, fix: Fixture[]) {
   var fixtures;
   if (!db) db = LocalApp.getInstance().firestore()
   if (TestDB.getKeys() === undefined) {
-    fixtures = new TestDB(fix).fixtures;
+    try {
+      fixtures = new TestDB(fix).fixtures;      
+    } catch (error) {
+      console.error(error)
+    }
   } else {
     initFixtures(fix);
     fixtures = TestFixtures;

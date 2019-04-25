@@ -5,6 +5,7 @@ import { DocumentData, Timestamp } from "@google-cloud/firestore";
 import { AuthError } from './auth_error';
 import { validate } from "class-validator";
 import { RecordType } from "./record_type";
+import { getCustomProperties } from "./utils";
 
 const NotSavedKeys = ["modelType", "errors", "collectionPath"]
 
@@ -243,6 +244,11 @@ export abstract class RecordModel {
 
     save<Q extends RecordModel>(cfg: IDBGroupConfig, id?: string): Promise<Q> {
         var data = this.data();
+        let customProps = getCustomProperties(data)
+        if(customProps.length>0) {
+            let msg = `Firestore cannot save object that has custom properties. Concerned properties are: ${customProps.join(", ")}`
+            return Promise.reject(new Error(msg))
+        }
         if (this.id == undefined || this.id === "new") {
             return this.newRecord(data, cfg)
         } else {

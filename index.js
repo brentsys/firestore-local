@@ -10,5 +10,6 @@ __export(require("./lib/record_type"));
 __export(require("./lib/describer"));
 __export(require("./lib/firestore_upload"));
 __export(require("./db/test_db"));
+__export(require("./lib/utils"));
 var firestore_1 = require("@google-cloud/firestore");
 exports.Timestamp = firestore_1.Timestamp;
