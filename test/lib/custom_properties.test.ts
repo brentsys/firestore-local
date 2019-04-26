@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { RecordType } from "../../lib/record_type"
 import { hasNoCustomProperties, getCustomProperties } from "../../lib/utils"
+import { Timestamp } from "@google-cloud/firestore";
 
 interface TestOptions {
     id: number
@@ -50,6 +51,7 @@ let testValues: TestOptions[]= [
     {id: 8, test: rt, result: false},
     {id: 9, test: [{a: "23", b:3}, rt], result: false},
     {id: 10, test: [["23", 3], {x: "23", y:3, z: rt}], result: false},
+    {id: 11, test: {dt: Timestamp.now()}, result: true},
 ]
 
 let t2Values: T2[]=[
@@ -62,6 +64,6 @@ let t2Values: T2[]=[
 
 
 describe("Custom Properties", function () {
-    //testValues.forEach(it_should_test_properties)
+    testValues.forEach(it_should_test_properties)
     t2Values.forEach(it_should_find_faulty_keys)
 })

@@ -1,3 +1,5 @@
+import { Timestamp } from "@google-cloud/firestore";
+
 type Field = { [key: string]: any }
 
 function noCustProps(obj: any): boolean {
@@ -20,6 +22,7 @@ export function hasNoCustomProperties(obj: any): boolean {
         if (obj instanceof Array) {
             return obj.reduce(reducer, true)
         } else {
+            if(obj instanceof Timestamp) return true
             if (noCustProps(obj)) {
                 let values = Object.keys(obj).map(x => obj[x])
                 return values.reduce(reducer, true)
