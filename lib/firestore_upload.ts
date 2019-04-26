@@ -20,6 +20,7 @@ export function recursiveDelete(done): Promise<any[]> {
     })
   } 
   return Promise.all(RecordType.values.map(mapper))
+    .then(()=> done())
 }
 
 

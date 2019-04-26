@@ -143,6 +143,7 @@ export interface IDocumentPath {
 
 export class DocumentPath implements IDocumentPath {
     constructor(public id: string, public collectionPath: string[]) {
+        if(collectionPath.length % 2 == 0) throw new Error("Collection Path should have odd length")
     }
 
     getParentDocumentPath(): DocumentPath | undefined {
