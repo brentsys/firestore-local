@@ -272,6 +272,7 @@ export interface QueryOrder {
     directionStr?: OrderByDirection
 }
 
+const InequalityOperators = [">", ">=", "<", "<="]
 
 export class QuerySnapshot {
     queries: Query[] = []
@@ -285,7 +286,21 @@ export class QuerySnapshot {
     where(field, comp, value): QuerySnapshot {
         var query = new Query(field, comp, value);
         this.queries.push(query);
+        let ineqFields = this.inequalityFilters()
+        if(ineqFields.length > 1) {
+            let msg = `Cannot have inequality filters on multiple properties: [${ineqFields.join(", ")}]`
+            throw new Error(msg)
+        }
         return this;
+    }
+
+    private inequalityFilters(): string[]{
+        return this.queries.reduce((acc: string[], cur: Query)=> {
+            if(InequalityOperators.find(x => cur.comp === x) !== undefined){
+                acc.push(cur.field)
+            }
+            return acc
+        },[])
     }
 
     orderBy(

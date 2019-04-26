@@ -19,6 +19,11 @@ export interface DescriberOptions {
     afterEach?: Fn
 }
 
+export interface BaseOptions {
+    id: number
+    skip?: boolean
+}
+
 let fix: any
 
 export function setFixtures(_fix: any){
