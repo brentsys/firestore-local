@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { fake, LocalDatabase, Fixture } from './local-firestore';
 import * as Firestore from '@google-cloud/firestore';
 import { TSMap } from 'typescript-map';
+import { FullDecoded } from './interfaces/jwt';
 
 const DEFAULT = "default"
 export type FirestoreType = fake.Database | Firestore.Firestore
@@ -34,7 +35,7 @@ let localApp: LocalApp
 
 export class LocalAuth {
     constructor(protected db: FirestoreType) { }
-    verifyIdToken(token: string, checkRevoked?: boolean): Promise<admin.auth.DecodedIdToken> {
+    verifyIdToken(token: string, checkRevoked?: boolean): Promise<FullDecoded> {
         return Promise.reject(new Error("verifyIdToken not implemented"))
     }
 }
