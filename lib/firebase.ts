@@ -15,7 +15,7 @@ export interface ILocalApp {
 export interface ServiceConfig {
     prodDatabaseUrl: string
     devDatabaseUrl: string
-    localCredentialsPath: string
+    localCredentialsPath: string | object
 }
 
 export type FBCollection = admin.firestore.CollectionReference
@@ -83,6 +83,7 @@ export class LocalApp implements ILocalApp {
 
     static makeLocalApp(fix: Fixture[], name?: string): LocalApp {
         if(name === undefined) name = DEFAULT
+        let credential = LocalApp.serviceConfig[name].localCredentialsPath
         if(name === DEFAULT){
             if (process.env.NODE_ENV == 'production') {
                 /*
@@ -95,10 +96,9 @@ export class LocalApp implements ILocalApp {
                 return new LocalApp(app.firestore())
             } else {
                 if (process.env.DB_REPO == 'remote') {
-                    let serviceAccount = require(LocalApp.serviceConfig[name].localCredentialsPath);
         
                     var defaultAppConfig = {
-                        credential: admin.credential.cert(serviceAccount),
+                        credential: admin.credential.cert(credential),
                         databaseURL: LocalApp.serviceConfig[name].devDatabaseUrl
                     };
                     // Initialize the default app
@@ -110,9 +110,8 @@ export class LocalApp implements ILocalApp {
                 }
             }            
         } else {
-            let serviceAccount = require(LocalApp.serviceConfig[name].localCredentialsPath);
             let app = admin.initializeApp({
-                credential: admin.credential.cert(serviceAccount),
+                credential: admin.credential.cert(credential),
                 databaseURL: LocalApp.serviceConfig[name].prodDatabaseUrl
             }, name);
             return new LocalApp(app.firestore())
