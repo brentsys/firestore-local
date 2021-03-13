@@ -38,8 +38,6 @@ export function noDeleteDatabase(res?: boolean){
 }
 export function desc<Q extends RecordModel>(title: string, fn: () => any, options?: DescriberOptions) {
 
-
-
     let db = LocalApp.getInstance().firestore()
     function reInit(fn: () => any): void {
         if (db instanceof LocalDatabase) {

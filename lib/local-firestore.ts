@@ -48,13 +48,14 @@ class WriteBatch {
     }
 
 
-    commit() {
+    commit(): Promise<void> {
         // Delete a bunch of documents
         let delPromises = Promise.all(this._delete.map((doc) => doc.delete(true)))
         let setPromises = Promise.all(this._set.map(pair => pair[0].set(pair[1])))
         return Promise.all([delPromises, setPromises])
             .then(() => {
                 this.context.saveDb()
+                return Promise.resolve()
             })
     };
 }
@@ -127,7 +128,7 @@ export class Transaction {
      */
     update(documentRef: DocumentRef, data: UpdateData,
         precondition?: Precondition): Transaction {
-            checkUndefinedValue(data)
+        checkUndefinedValue(data)
         this.get(documentRef)
             .then(docRef => {
                 if (!docRef.exists) return Promise.reject(new Error("Document not found"))
@@ -208,19 +209,19 @@ export class LocalDatabase {
         return TestFixtures;
     }
 
-    private init(fix : Fixture[], noDisplay?: boolean) {
+    private init(fix: Fixture[], noDisplay?: boolean) {
         initFixtures = fix
-        if(TestDB._keys === undefined) new TestDB(fix)
+        if (TestDB._keys === undefined) new TestDB(fix)
         TestFixtures.filter(value => { return false }) // clear
-        for (let i=0; i < TestDB.getKeys().length; i++) {
+        for (let i = 0; i < TestDB.getKeys().length; i++) {
             let key = TestDB.getKey(i)
             TestFixtures.set(key, Object.assign({}, TestDB.getValue(i)))
         }
-        if(!noDisplay) console.log("DB Fixtures initialized with ", TestFixtures.length, "elements")
+        if (!noDisplay) console.log("DB Fixtures initialized with ", TestFixtures.length, "elements")
     }
 
-    reset(): void{
-        this.init(initFixtures,true)
+    reset(): void {
+        this.init(initFixtures, true)
     }
 
     collection(ref: string, document?: Document): Collection {
@@ -248,16 +249,16 @@ const DbPath = path.join(__dirname, '..', getDbFile());
 
 export class Query {
     constructor(readonly field: string, readonly comp: WhereFilterOp, readonly value: any) {
-        if(field === undefined) throw new Error(`Invalid query with 'field' undefined`)
-        if(comp === undefined) throw new Error(`Invalid query with 'comp' undefined`)
-        if(value === undefined) throw new Error(`Invalid query with 'value' undefined`)
+        if (field === undefined) throw new Error(`Invalid query with 'field' undefined`)
+        if (comp === undefined) throw new Error(`Invalid query with 'comp' undefined`)
+        if (value === undefined) throw new Error(`Invalid query with 'value' undefined`)
     }
 
     filter(list) {
         let value = this.value
         if (typeof value == "string") value = `'${value}'`
         let filterString: string
-        if(value instanceof Timestamp){
+        if (value instanceof Timestamp) {
             filterString = `(x) => x.data().${this.field}.toMillis() ${this.comp} ${value.toMillis()}`;
         } else {
             filterString = `(x) => x.data().${this.field} ${this.comp} ${value}`;
@@ -287,20 +288,20 @@ export class QuerySnapshot {
         var query = new Query(field, comp, value);
         this.queries.push(query);
         let ineqFields = this.inequalityFilters()
-        if(ineqFields.length > 1) {
+        if (ineqFields.length > 1) {
             let msg = `Cannot have inequality filters on multiple properties: [${ineqFields.join(", ")}]`
             throw new Error(msg)
         }
         return this;
     }
 
-    private inequalityFilters(): string[]{
-        return this.queries.reduce((acc: string[], cur: Query)=> {
-            if(InequalityOperators.find(x => cur.comp === x) !== undefined){
+    private inequalityFilters(): string[] {
+        return this.queries.reduce((acc: string[], cur: Query) => {
+            if (InequalityOperators.find(x => cur.comp === x) !== undefined) {
                 acc.push(cur.field)
             }
             return acc
-        },[])
+        }, [])
     }
 
     orderBy(
@@ -455,9 +456,9 @@ function setDocumentData(data) {
     this.exists = !!data;
 }
 
-function checkUndefinedValue(data: DocumentData): void{
+function checkUndefinedValue(data: DocumentData): void {
     let values = Object.keys(data).map(key => data[key])
     let idx = values.indexOf(undefined)
-    if(idx < 0) return;
+    if (idx < 0) return;
     throw new Error(`Cannot save field undefined: ${Object.keys(data)[idx]}`)
 }

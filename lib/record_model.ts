@@ -95,7 +95,7 @@ export class RecordAction<Q extends RecordModel> {
     };
 
 
-    findAll(queries: Query[] = [], order?: QueryOrder): Promise<Q[]> {
+    findAll(queries: Query[] = [], order?: QueryOrder, limit?: number): Promise<Q[]> {
         let rm = this;
         var qs = this.getCollection() as any
         for (var query of queries) {
@@ -104,7 +104,10 @@ export class RecordAction<Q extends RecordModel> {
             qs = qs.where(field, comp, value);
         }
         if (order !== undefined) {
-            qs.orderBy(order.fieldPath, order.directionStr)
+            qs = qs.orderBy(order.fieldPath, order.directionStr)
+        }
+        if (limit !== undefined) {
+            qs = qs.limit(limit)
         }
         let recordAction = this
         if (this.debug > 0) console.log(`[debug-${this.debug}]`, "qs =>", qs)
@@ -143,7 +146,7 @@ export interface IDocumentPath {
 
 export class DocumentPath implements IDocumentPath {
     constructor(public id: string, public collectionPath: string[]) {
-        if(collectionPath.length % 2 == 0) throw new Error("Collection Path should have odd length")
+        if (collectionPath.length % 2 == 0) throw new Error("Collection Path should have odd length")
     }
 
     getParentDocumentPath(): DocumentPath | undefined {
@@ -246,7 +249,7 @@ export abstract class RecordModel {
     save<Q extends RecordModel>(cfg: IDBGroupConfig, id?: string): Promise<Q> {
         var data = this.data();
         let customProps = getCustomProperties(data)
-        if(customProps.length>0) {
+        if (customProps.length > 0) {
             let msg = `Firestore cannot save object that has custom properties. Concerned properties are: ${customProps.join(", ")}`
             return Promise.reject(new Error(msg))
         }

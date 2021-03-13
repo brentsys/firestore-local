@@ -105,6 +105,8 @@ export class LocalApp implements ILocalApp {
                     return new LocalApp(admin.initializeApp(defaultAppConfig).firestore())
         
                 } else {
+                    //firestore cannot run withoout a default app
+                    // we have to create one to be able to use systemId app                    
                     let localFirestore = new LocalDatabase(fix)
                     return new LocalApp(localFirestore)
                 }
